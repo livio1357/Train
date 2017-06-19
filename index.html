@@ -137,18 +137,7 @@ text-decoration-style: bold;
 
 <script type="text/javascript">
 
-console.log(moment());
-  // Initialize Firebase
-   // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyAISyJYbxhqFPb6Jd55tGvCcg9J4J9ZhCI",
-    authDomain: "train-650d0.firebaseapp.com",
-    databaseURL: "https://train-650d0.firebaseio.com",
-    projectId: "train-650d0",
-    storageBucket: "train-650d0.appspot.com",
-    messagingSenderId: "696069193018"
-  };
-  firebase.initializeApp(config);
+
 
 
 
@@ -165,6 +154,12 @@ var nextTime = [];
 var frequency = [];
 
 var databaseTime = [];
+
+// var now = moment().format();
+//var convertTime = moment(snapshot.val().nextTime).format();
+// var diff = moment(now).diff(convertTime, "HH:mm")
+//var away = nexTime - snapshot.val().currentTime;
+//Missing some logic and miss understand moment js a bit for finding the away time of the next train
 
 
 // currentTime
@@ -230,6 +225,8 @@ rate: rate,
 
 })
 
+
+// clearing the values after clicking submit
 $('#name').val('');
 $('#destination').val('');
 $('#startTime').val('');
