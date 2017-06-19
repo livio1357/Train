@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Train Times</title>
+
+
+	<script
+ src="https://code.jquery.com/jquery-3.2.1.min.js"
+ integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+ crossorigin="anonymous">
+ </script>
+	<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>
+
+<script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+
+
+
+
+ <script  src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"> </script>
+</head>
+<body>
+
+<style type="text/css">
+	
+.jumbotron{
+background-image: url("https://www.uic.edu/_assets/f4316fc13bb93f8f26a862ce57c010c9.jpg");
+
+
+
+}
+.bold{
+
+text-decoration-style: bold;
+
+
+}
+
+
+
+</style>
+<div class="jumbotron">
+	<div class="text-center"> <h1 class="bold"> Train Times</h1> <h3>Bow Bow Bow Bow</h3></div>
+</div>
+
+
+<div class="container">
+	<div class="row panel panel-info">
+		<div class="panel-heading">Current Train Schedule
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-lg-3"></div>	
+
+					<table class='table'>
+
+					<tbody id="user-data">
+
+				<tr>
+
+					<th class='col-lg-3'>Train Name</th>
+
+					<th class='col-lg-3'>Destination</th>
+
+					<th class='col-lg-2'>Frequency (min)</th>
+
+					<th class='col-lg-2'>Next Arrival</th>
+
+					<th class='col-lg-2'>Minutes Away</th>
+
+					
+
+				</tr>
+			
+			
+				
+			</tbody>
+
+			</table>
+
+
+
+			</div>
+
+
+
+
+
+
+		</div>
+
+
+
+	</div>
+
+
+
+
+	<div class="row panel panel-success">
+		<div class="panel-heading">Add Train
+		</div>
+		<div class="panel-body">
+
+
+		<p>Train Name</p> 
+		<input id="name" type="input" name="name"> </br></br>
+		<p>Destination</p>
+		<input id="destination" type="input" name="destination"></br></br>
+		<p>First Train Time: (HH:mm - miltary time)</p>
+		<input id="startTime" type="input" name="startTime"></br></br>
+		<p>Frequency</p>
+		<input id="rate" type="input" name="rate"> </br> </br>
+
+
+		<input id="submit" class="btn btn-primary" type="submit" name="submit">
+
+
+
+		</div>
+
+
+
+	</div>
+
+
+</div>
+
+<script type="text/javascript">
+
+console.log(moment());
+  // Initialize Firebase
+   // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAISyJYbxhqFPb6Jd55tGvCcg9J4J9ZhCI",
+    authDomain: "train-650d0.firebaseapp.com",
+    databaseURL: "https://train-650d0.firebaseio.com",
+    projectId: "train-650d0",
+    storageBucket: "train-650d0.appspot.com",
+    messagingSenderId: "696069193018"
+  };
+  firebase.initializeApp(config);
+
+
+
+var database = firebase.database();
+
+
+var name = ""; 
+var destination = "";
+
+var rate = 0;
+var away = 0;
+var nextTime = [];
+
+var frequency = [];
+
+var databaseTime = [];
+
+
+// currentTime
+var currentTime = moment().format("HH:mm");
+
+
+
+database.ref().on("child_added", function(snapshot) {
+
+	
+
+
+
+
+databaseTime.push(snapshot.val().startTime);
+frequency.push(snapshot.val().rate);
+
+
+for (i = 0; i < databaseTime.length; i++) {
+
+
+
+		 var firstTime = moment(databaseTime[i], "HH:mm").format("HH:mm");
+            
+
+       while (moment().format('HH:mm') > firstTime) {
+             firstTime = moment(firstTime, "HH:mm").add({minutes:frequency[i]}).format('HH:mm');
+           };
+
+nextTime.push(firstTime);
+		
+	}
+
+
+	// moment().subtract(currentTime, firstTime)
+
+// adding to the dom
+$('#user-data').append('<tr><td>'+snapshot.val().name+'</td><td>'+snapshot.val().destination+'</td><td>'+snapshot.val().rate+'</td><td>'+firstTime+'</td><td>'+snapshot.val().away+'</td></tr>')
+});
+
+
+
+
+//dealing with the data in the form and going to the database
+$("#submit").on("click", function(event){
+	event.preventDefault();
+
+
+	name = $("#name").val().trim();
+		destination = $("#destination").val().trim();
+		startTime = $("#startTime").val().trim();
+		rate = $("#rate").val().trim();
+
+
+
+	database.ref().push({
+name: name,
+destination: destination,
+startTime: startTime,
+
+rate: rate,
+
+
+})
+
+$('#name').val('');
+$('#destination').val('');
+$('#startTime').val('');
+$('#rate').val('');
+
+});
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+	
+</body>
+</html>
